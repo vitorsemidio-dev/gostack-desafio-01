@@ -4,24 +4,30 @@ const server = express();
 
 server.use(express.json());
 
+const projects = [];
+
 server.get('/projects', (req, res) => {
-  return res.send({ ok: 'sucesso get' })
+  return res.json(projects);
 });
 
 server.get('/projects/:id', (req, res) => {
-  return res.send({ ok: 'sucesso get :id' })
+  const { id } = req.params;
+  return res.json(projects[id]);
 });
 
 server.post('/projects', (req, res) => {
-  return res.send({ ok: 'sucesso post' })
+  const { id, title, tasks } = req.body;
+  const project = { id, title, tasks };
+  projects.push(project);
+  return res.json( project );
 });
 
 server.put('/projects/:id', (req, res) => {
-  return res.send({ ok: 'sucesso put' })
+  return res.json({ ok: 'sucesso put' });
 });
 
 server.delete('/projects/:id', (req, res) => {
-  return res.send({ ok: 'sucesso delete' })
+  return res.json({ ok: 'sucesso delete' });
 });
 
 
