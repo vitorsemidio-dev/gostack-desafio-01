@@ -19,7 +19,7 @@ server.get('/projects/:id', (req, res) => {
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(400).json({ error: 'User does not found' });
+    return res.status(400).json({ error: 'Project does not found' });
   }
 
   const project = projects[index];
@@ -28,17 +28,36 @@ server.get('/projects/:id', (req, res) => {
 });
 
 server.post('/projects', (req, res) => {
-  const { id, title, tasks } = req.body;
-  const project = { id, title, tasks };
+  const { id, title } = req.body;
+  const project = { id, title };
   projects.push(project);
   return res.json( project );
 });
 
 server.put('/projects/:id', (req, res) => {
-  return res.json({ ok: 'sucesso put' });
+  const { id } = req.params;
+  const { title } = req.body;
+  const index = findIndex(projects, id);
+
+  if (index === -1) {
+    return res.status(400).json({ error: 'Project does not found' });
+  }
+
+  const project = projects[index];
+  project.title = title;
+
+  return res.json(project);
 });
 
 server.delete('/projects/:id', (req, res) => {
+  const { id } = req.params;
+  const index = findIndex(projects, id);
+
+  if (index === -1) {
+    return res.status(400).json({ error: 'Project does not found' });
+  }
+
+
   return res.json({ ok: 'sucesso delete' });
 });
 
