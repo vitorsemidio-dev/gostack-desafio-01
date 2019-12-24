@@ -10,13 +10,19 @@ server.get('/projects', (req, res) => {
   return res.json(projects);
 });
 
+function findIndex(array, id) {
+  return array.findIndex(p => p.id === id);
+}
+
 server.get('/projects/:id', (req, res) => {
   const { id } = req.params;
-  const project = projects.find(p => p.id === id);
+  const index = findIndex(projects, id);
 
-  if (!project) {
+  if (index === -1) {
     return res.status(400).json({ error: 'User does not found' });
   }
+
+  const project = projects[index];
   
   return res.json(project);
 });
