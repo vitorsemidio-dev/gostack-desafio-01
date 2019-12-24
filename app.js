@@ -4,7 +4,16 @@ const server = express();
 
 server.use(express.json());
 
+let calls = 0;
+
 const projects = [];
+
+function showNumberOfCalls(req, res, next) {
+  console.log(`Number of calls: ${++calls}`);
+  next();
+}
+
+server.use(showNumberOfCalls);
 
 function findIndex(array, id) {
   return array.findIndex(p => p.id === id);
@@ -12,10 +21,6 @@ function findIndex(array, id) {
 
 function notFoundMsgError(response) {
   return response.status(404).json({ error: 'Project does not found' });
-}
-
-function log() {
-
 }
 
 function checkProjectExists(req, res, next) {
@@ -33,8 +38,6 @@ function checkProjectExists(req, res, next) {
 server.get('/projects', (req, res) => {
   return res.json(projects);
 });
-
-
 
 server.get('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
@@ -82,9 +85,8 @@ server.delete('/projects/:id', checkProjectExists, (req, res) => {
 
   projects.splice(index, 1);
 
-  return res.send(200);
+  return res.sendStatus(200);
 });
-
 
 server.post('/projects/:id/tasks', checkProjectExists, (req, res) => {
   const { id } = req.params;
