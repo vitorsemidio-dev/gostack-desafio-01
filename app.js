@@ -6,20 +6,42 @@ server.use(express.json());
 
 const projects = [];
 
-server.get('/projects', (req, res) => {
-  return res.json(projects);
-});
-
 function findIndex(array, id) {
   return array.findIndex(p => p.id === id);
 }
 
-server.get('/projects/:id', (req, res) => {
+function notFoundMsgError(response) {
+  return response.status(404).json({ error: 'Project does not found' });
+}
+
+function log() {
+
+}
+
+function checkProjectExists(req, res, next) {
   const { id } = req.params;
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(400).json({ error: 'Project does not found' });
+    return res.status(404).json({ error: 'Project did not found by middleware' });
+    // return notFoundMsgError(res);
+  }
+
+  return next();
+}
+
+server.get('/projects', (req, res) => {
+  return res.json(projects);
+});
+
+
+
+server.get('/projects/:id', checkProjectExists, (req, res) => {
+  const { id } = req.params;
+  const index = findIndex(projects, id);
+
+  if (index === -1) {
+    return notFoundMsgError(res);
   }
 
   const project = projects[index];
@@ -35,13 +57,13 @@ server.post('/projects', (req, res) => {
   return res.json( project );
 });
 
-server.put('/projects/:id', (req, res) => {
+server.put('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(400).json({ error: 'Project does not found' });
+    return notFoundMsgError(res);
   }
 
   const project = projects[index];
@@ -50,27 +72,27 @@ server.put('/projects/:id', (req, res) => {
   return res.json(project);
 });
 
-server.delete('/projects/:id', (req, res) => {
+server.delete('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(400).json({ error: 'Project does not found' });
+    return notFoundMsgError(res);
   }
 
   projects.splice(index, 1);
 
-  return res.status(200);
+  return res.send(200);
 });
 
 
-server.post('/projects/:id/tasks', (req, res) => {
+server.post('/projects/:id/tasks', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(400).json({ error: 'Project does not found' });
+    return notFoundMsgError(res)
   }
 
   const project = projects[index];
