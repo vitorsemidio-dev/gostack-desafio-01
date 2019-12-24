@@ -12,7 +12,13 @@ server.get('/projects', (req, res) => {
 
 server.get('/projects/:id', (req, res) => {
   const { id } = req.params;
-  return res.json(projects[id]);
+  const project = projects.find(p => p.id === id);
+
+  if (!project) {
+    return res.status(400).json({ error: 'User does not found' });
+  }
+  
+  return res.json(project);
 });
 
 server.post('/projects', (req, res) => {
