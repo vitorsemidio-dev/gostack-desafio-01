@@ -28,8 +28,7 @@ function checkProjectExists(req, res, next) {
   const index = findIndex(projects, id);
 
   if (index === -1) {
-    return res.status(404).json({ error: 'Project did not found by middleware' });
-    // return notFoundMsgError(res);
+    return notFoundMsgError(res);
   }
 
   return next();
@@ -43,10 +42,6 @@ server.get('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const index = findIndex(projects, id);
 
-  if (index === -1) {
-    return notFoundMsgError(res);
-  }
-
   const project = projects[index];
   
   return res.json(project);
@@ -55,8 +50,15 @@ server.get('/projects/:id', checkProjectExists, (req, res) => {
 server.post('/projects', (req, res) => {
   const { id, title } = req.body;
   const tasks = [];
+  const index = findIndex(projects, id);
+
+  if (index !== -1) {
+    return res.status(409).json({ error: 'Project already exists' });
+  }
+
   const project = { id, title, tasks };
   projects.push(project);
+  
   return res.json( project );
 });
 
@@ -64,10 +66,6 @@ server.put('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
   const index = findIndex(projects, id);
-
-  if (index === -1) {
-    return notFoundMsgError(res);
-  }
 
   const project = projects[index];
   project.title = title;
@@ -79,10 +77,6 @@ server.delete('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const index = findIndex(projects, id);
 
-  if (index === -1) {
-    return notFoundMsgError(res);
-  }
-
   projects.splice(index, 1);
 
   return res.sendStatus(200);
@@ -92,10 +86,6 @@ server.post('/projects/:id/tasks', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
   const index = findIndex(projects, id);
-
-  if (index === -1) {
-    return notFoundMsgError(res)
-  }
 
   const project = projects[index];
   project.tasks.push(title);
